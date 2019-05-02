@@ -7,12 +7,9 @@ const width = 64;
 const height = 64;
 var canvasWidth = 720;
 var canvasHeight = 540;
-var regX = 24;
-var regY = 24;
 //画面余白
 var leftWidth = (canvasWidth - (column * width)) / 2;
 var upHeight = (canvasHeight - (row * height)) / 2;
-var timer = NaN;
 var stage = new createjs.Stage("myCanvas");
 // マウスオーバーを有効にする
 stage.enableMouseOver();
@@ -71,7 +68,7 @@ var shape;
 var container = new createjs.Container();
 //プレイヤーカラー
 var colorShape = new createjs.Container();
-//駒データ
+//駒データのフレーム情報など
 var huDate_1p = {
     images: [hu1p],
     frames: {
@@ -85,12 +82,6 @@ var huDate_1p = {
         run2: 10
     },
 };
-//var huDate_1p = {
-//    images: [hu1p],
-//    frames: {
-//        width: frame_width,
-//        height: frame_height,
-//    },
 //    animations: {
 //        // start, end, next, frequency
 //        run: {
@@ -114,7 +105,6 @@ var huDate_2p = {
         height: frame_height,
     },
     animations: {
-        // start, end, next, frequency
         run: 0,
         run2: 1
     },
@@ -126,7 +116,6 @@ var kyoDate_1p = {
         height: frame_height,
     },
     animations: {
-        // start, end, next, frequency
         //        run: 43
         run: 4
     },
@@ -138,7 +127,6 @@ var kyoDate_2p = {
         height: frame_height,
     },
     animations: {
-        // start, end, next, frequency
         //        run: 10
         run: 4
     },
@@ -150,7 +138,6 @@ var keiDate_1p = {
         height: frame_height,
     },
     animations: {
-        // start, end, next, frequency
         //        run: 85
         run: 2
     },
@@ -162,7 +149,6 @@ var keiDate_2p = {
         height: frame_height,
     },
     animations: {
-        // start, end, next, frequency
         //        run: 52
         run: 2
     },
@@ -174,7 +160,6 @@ var ginDate_1p = {
         height: frame_height,
     },
     animations: {
-        // start, end, next, frequency
         //        run: 91
         run: 0,
         run2: 2
@@ -187,7 +172,6 @@ var ginDate_2p = {
         height: frame_height,
     },
     animations: {
-        // start, end, next, frequency
         //        run: 58
         run: 0,
         run2: 1
@@ -200,7 +184,6 @@ var kinDate_1p = {
         height: frame_height,
     },
     animations: {
-        // start, end, next, frequency
         //        run: 37
         run: 1
     },
@@ -212,7 +195,6 @@ var kinDate_2p = {
         height: frame_height,
     },
     animations: {
-        // start, end, next, frequency
         //        run: 4
         run: 1
     },
@@ -224,7 +206,6 @@ var gyokuDate_1p = {
         height: frame_height,
     },
     animations: {
-        // start, end, next, frequency
         //        run: 85
         run: 1
     },
@@ -236,7 +217,6 @@ var gyokuDate_2p = {
         height: frame_height,
     },
     animations: {
-        // start, end, next, frequency
         //        run: 52
         run: 2
     },
@@ -248,7 +228,6 @@ var syaDate_1p = {
         height: frame_height,
     },
     animations: {
-        // start, end, next, frequency
         //        run: 37
         run: 12
     },
@@ -260,7 +239,6 @@ var syaDate_2p = {
         height: frame_height,
     },
     animations: {
-        // start, end, next, frequency
         //        run: 10
         run: 12
     },
@@ -272,7 +250,6 @@ var kakuDate_1p = {
         height: frame_height,
     },
     animations: {
-        // start, end, next, frequency
         //        run: 40
         run: 13
     },
@@ -284,7 +261,6 @@ var kakuDate_2p = {
         height: frame_height,
     },
     animations: {
-        // start, end, next, frequency
         //        run: 7
         run: 13
     },
@@ -358,10 +334,6 @@ function initGame() {
 function init() {
     for (var i = 0; i < row; i++) {
         cell[i] = [];
-        //        waitUnit_1p[i] = [];
-        //        waitUnit_2p[i] = [];
-        //        waitKind_1p[i] = [];
-        //        waitKind_2p[i] = [];
         for (var j = 0; j < column; j++) {
             var unit = {
                 name: "hoge",
@@ -369,20 +341,7 @@ function init() {
                 kind: "hoge",
                 kind2: "hoge"
             }
-            //            var waitUnit = {
-            //                name: "hoge",
-            //                turn: "hoge",
-            //                kind: "hoge"
-            //            }
-            //            var waitUnit2 = {
-            //                kind: "hoge",
-            //                kind2: "hoge"
-            //            }
             cell[i][j] = unit;
-            //            waitUnit_1p[i][j] = waitUnit;
-            //            waitUnit_2p[i][j] = waitUnit;
-            //            waitKind_1p[i][j] = waitUnit2;
-            //            waitKind_2p[i][j] = waitUnit2;
         }
     }
     //歩1P
@@ -822,16 +781,9 @@ function unitChoose(event) {
     var judgeUnitX = xToIndex(judgeUnit.x);
     var result;
     if (cell[judgeUnitY][judgeUnitX].turn == playturn) {
-        //選択パネル初期化
-        //        if (changeCount > 0) {
-        //            //        if (container.getChildIndex != -1) {
-        //            container.removeAllChildren();
-        //        }
         if (container.getChildIndex != -1) {
             container.removeAllChildren();
         }
-        //コンテナ作成
-        //container = new createjs.Container();
         //ユニット格納
         cUnit = event.target;
         //自分がいるセルの番号
@@ -840,6 +792,7 @@ function unitChoose(event) {
         //セル番号の増減
         var y = (playturn == 1) ? -1 : 1;
         var heightY = (playturn == 1) ? -height : height;
+        //コンテナ作成
         container = new createjs.Container();
         container.x = 0;
         container.y = 0;
@@ -923,14 +876,11 @@ function moveUnit(event) {
     var countY = (playturn == 1) ? countY_1p : countY_2p;
     var waitUnitX = (playturn == 1) ? waitUnit_1p : waitUnit_2p;
     var waitKindX = (playturn == 1) ? waitKind_1p : waitKind_2p;
-    //    var waitX = (playturn == 1) ? leftWidth + (row * width) + (countX_1p * width) : countX_2p * width;
     var waitX = (playturn == 1) ? (canvasWidth - width) - (countX_1p * width) : countX_2p * width;
     var waitY = (playturn == 1) ? canvasHeight - ((countY_1p * height) + height) : countY_2p * height;
     var instance = event.target;
     //移動ユニットのセル番号
     var unitY = yToIndex(cUnit.y);
-    //    (cUnit.y - height) / height;
-    //    var unitX = (cUnit.x - leftWidth) / height;
     var unitX = xToIndex(cUnit.x);
     //移動先セルの番号
     var moveY = yToIndex(instance.y);
